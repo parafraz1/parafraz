@@ -81,10 +81,18 @@ export default function PdfUploader() {
 
   const saveToDb = async (newCatalogs: CatalogBook[]) => {
     const { data: exist } = await supabase.from('pages').select('id').eq('slug', 'catalogs_data').maybeSingle();
+    let err = null;
     if (exist) {
-      await supabase.from('pages').update({ content: JSON.stringify(newCatalogs) }).eq('slug', 'catalogs_data');
+      const { error } = await supabase.from('pages').update({ content: JSON.stringify(newCatalogs) }).eq('slug', 'catalogs_data');
+      err = error;
     } else {
-      await supabase.from('pages').insert({ slug: 'catalogs_data', title: 'Catalogs List', content: JSON.stringify(newCatalogs) });
+      const { error } = await supabase.from('pages').insert({ slug: 'catalogs_data', title: 'Catalogs List', content: JSON.stringify(newCatalogs) });
+      err = error;
+    }
+    if (err) {
+      console.error(err);
+      alert("Bazada yadda saxlamaq mümkün olmadı: " + err.message);
+      throw err;
     }
   };
 
@@ -107,11 +115,16 @@ export default function PdfUploader() {
       newCatalogs.push(newCat);
     }
 
-    await saveToDb(newCatalogs);
-    setCatalogs(newCatalogs);
-    setEditingCatId(null);
-    setTitle(''); setImage(''); setDescription(''); setPdfAz(''); setPdfEn('');
-    setIsSaving(false);
+    try {
+      await saveToDb(newCatalogs);
+      setCatalogs(newCatalogs);
+      setEditingCatId(null);
+      setTitle(''); setImage(''); setDescription(''); setPdfAz(''); setPdfEn('');
+    } catch (e) {
+      // alert handled
+    } finally {
+      setIsSaving(false);
+    }
   };
 
   const handleEdit = (cat: CatalogBook) => {
@@ -126,8 +139,12 @@ export default function PdfUploader() {
   const handleDelete = async (id: string) => {
     if (!confirm("Silmək istədiyinizə əminsiniz?")) return;
     const newCatalogs = catalogs.filter(c => c.id !== id);
-    await saveToDb(newCatalogs);
-    setCatalogs(newCatalogs);
+    try {
+      await saveToDb(newCatalogs);
+      setCatalogs(newCatalogs);
+    } catch (e) {
+      // alert is handled in saveToDb
+    }
   };
 
   return (
