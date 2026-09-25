@@ -8,11 +8,11 @@ export default async function Haqqimizda() {
       <div className="max-w-[800px] mx-auto px-4">
         
         <div className="border-b border-gray-300 mb-8 pb-3 flex items-center justify-between group">
-          <h1 className="text-gray-800 text-2xl uppercase font-bold tracking-wide">{page?.title || 'Haqqımızda'}</h1>
+          <h1 className="text-gray-800 text-[12px] xl:text-[13px] uppercase font-bold tracking-wide">{page?.title || 'Haqqımızda'}</h1>
           <div className="h-[2px] w-24 bg-[#f97316] relative top-[15px]"></div>
         </div>
 
-        <div className="prose prose-lg text-gray-700 leading-relaxed space-y-4">
+        <div className="prose prose-sm text-gray-700 leading-relaxed space-y-4">
           <div dangerouslySetInnerHTML={{ __html: page?.content || '' }} />
                  </div>
 

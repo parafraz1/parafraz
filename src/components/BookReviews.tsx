@@ -68,7 +68,7 @@ export default function BookReviews({ initialReviews, bookId }: BookReviewsProps
       <div className="grid grid-cols-1 md:grid-cols-2 gap-12">
         {/* Review Form */}
         <div>
-          <h3 className="font-bold text-gray-700 mb-4 text-lg">Öz rəyinizi bildirin</h3>
+          <h3 className="font-bold text-gray-700 mb-4 text-[12px] xl:text-[13px] uppercase tracking-wider">Öz rəyinizi bildirin</h3>
           <form onSubmit={handleSubmit} className="flex flex-col gap-4">
             <div>
               <label className="block text-sm font-semibold text-gray-600 mb-1">Adınız və soyadınız</label>
@@ -128,7 +128,7 @@ export default function BookReviews({ initialReviews, bookId }: BookReviewsProps
 
         {/* Reviews List */}
         <div>
-          <h3 className="font-bold text-gray-700 mb-4 text-lg">Son rəylər ({reviews.length})</h3>
+          <h3 className="font-bold text-gray-700 mb-4 text-[12px] xl:text-[13px] uppercase tracking-wider">Son rəylər ({reviews.length})</h3>
           
           {reviews.length === 0 ? (
             <p className="text-gray-500 italic">Hələ heç bir rəy yazılmayıb. İlk rəy yazan siz olun!</p>

@@ -8,7 +8,7 @@ export default async function Page() {
       <div className="max-w-[1000px] mx-auto px-4">
         
         <div className="text-center mb-12">
-          <h1 className="text-3xl md:text-4xl font-extrabold text-gray-800 uppercase tracking-wider mb-4">{page?.title || 'Bizimlə Əlaqə'}</h1>
+          <h1 className="text-[12px] xl:text-[13px] font-extrabold text-gray-800 uppercase tracking-wider mb-4">{page?.title || 'Bizimlə Əlaqə'}</h1>
           <div className="h-[3px] w-24 bg-[#f97316] mx-auto rounded"></div>
         </div>
 
@@ -17,7 +17,7 @@ export default async function Page() {
           {/* Sol Tərəf: Əlaqə Məlumatları */}
           <div className="flex flex-col space-y-8">
             <div>
-              <h2 className="text-2xl font-bold text-gray-800 mb-6">Əlaqə Vasitələrimiz</h2>
+              <h2 className="text-[12px] xl:text-[13px] uppercase tracking-wider font-bold text-gray-800 mb-6">Əlaqə Vasitələrimiz</h2>
             </div>
 
             <div className="space-y-6">
@@ -27,7 +27,7 @@ export default async function Page() {
                 </div>
                 <div>
                   <p className="text-sm text-gray-500 font-medium">WhatsApp / Zəng</p>
-                  <p className="text-lg font-bold text-gray-800 group-hover:text-green-600 transition-colors">+994 70 920 18 55</p>
+                  <p className="text-sm font-bold text-gray-800 group-hover:text-green-600 transition-colors">+994 70 920 18 55</p>
                 </div>
               </a>
 
@@ -37,7 +37,7 @@ export default async function Page() {
                 </div>
                 <div>
                   <p className="text-sm text-gray-500 font-medium">E-poçt ünvanı</p>
-                  <p className="text-lg font-bold text-gray-800 group-hover:text-[#f97316] transition-colors">info@parafraz.site</p>
+                  <p className="text-sm font-bold text-gray-800 group-hover:text-[#f97316] transition-colors">info@parafraz.site</p>
                 </div>
               </a>
               
@@ -47,7 +47,7 @@ export default async function Page() {
                 </div>
                 <div>
                   <p className="text-sm text-gray-500 font-medium">Əlavə Nömrə</p>
-                  <p className="text-lg font-bold text-gray-800 group-hover:text-blue-600 transition-colors">+994 55 479 16 02</p>
+                  <p className="text-sm font-bold text-gray-800 group-hover:text-blue-600 transition-colors">+994 55 479 16 02</p>
                 </div>
               </a>
             </div>
@@ -55,7 +55,7 @@ export default async function Page() {
 
           {/* Sağ Tərəf: Form */}
           <div className="bg-gray-50 p-6 md:p-8 rounded-xl border border-gray-100">
-            <h2 className="text-2xl font-bold text-gray-800 mb-2">Bizə Mesaj Göndərin</h2>
+            <h2 className="text-[12px] xl:text-[13px] uppercase tracking-wider font-bold text-gray-800 mb-2">Bizə Mesaj Göndərin</h2>
             <p className="text-gray-500 text-sm mb-6">Təklif, irad və ya suallarınızı bizə yaza bilərsiniz.</p>
             
             <form action="https://formsubmit.co/info@parafraz.site" method="POST" className="flex flex-col gap-4">

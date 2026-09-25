@@ -1,6 +1,7 @@
 import React from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
+import NewsTitle from '@/components/NewsTitle';
 import ShareButton from '@/components/ShareButton';
 import { notFound } from 'next/navigation';
 import { supabase } from '@/lib/supabase';
@@ -56,7 +57,7 @@ export default async function NewsDetailPage({ params }: { params: Promise<{ id:
         </span>
       </div>
       
-      <NewsTitle title={news.title} className="text-lg md:text-xl font-black mb-6 leading-snug tracking-tight" />
+      <NewsTitle title={news.title} className="text-[12px] xl:text-[13px] uppercase font-black mb-6 leading-snug tracking-tight" />
       
       <div className="relative w-full aspect-[16/9] bg-gray-100 rounded-xl overflow-hidden mb-8 shadow-sm border border-gray-100">
         <Image src={news.image} alt={news.title} fill className="object-cover" />

@@ -24,7 +24,7 @@ export default async function XeberlerPage() {
               </div>
               <div className="p-5 flex-1 flex flex-col">
                 <span className="text-[#f97316] text-xs font-bold mb-2">{n.date}</span>
-                <NewsTitle title={n.title} className="text-lg font-bold mb-3 leading-snug line-clamp-2" />
+                <NewsTitle title={n.title} className="text-[12px] xl:text-[13px] uppercase font-bold mb-3 leading-snug line-clamp-2" />
                 <div className="text-gray-600 text-sm line-clamp-3 mb-4 flex-1" dangerouslySetInnerHTML={{ __html: n.content }} />
               </div>
             </Link>

@@ -111,7 +111,7 @@ export default async function BookDetailsPage({ params }: { params: Promise<{ id
           </div>
 
           <div className="bg-gray-50 border border-gray-200 rounded p-5 mb-8">
-            <h3 className="font-bold text-gray-800 uppercase tracking-wide mb-4 border-b border-gray-200 pb-2">Xüsusiyyətləri</h3>
+            <h3 className="text-[12px] xl:text-[13px] font-bold text-gray-800 uppercase tracking-wider mb-4 border-b border-gray-200 pb-2">Xüsusiyyətləri</h3>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-y-3 gap-x-6 text-sm">
               <div className="flex justify-between border-b border-gray-200 pb-1">
                 <span className="text-gray-500">Səhifə sayı:</span>

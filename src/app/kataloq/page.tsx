@@ -11,7 +11,7 @@ export default function KataloqPage() {
         {/* AZ PDF */}
         <div className="flex flex-col h-full bg-white p-4 rounded-xl shadow border border-gray-100">
           <div className="flex justify-between items-center mb-4">
-            <h2 className="text-lg font-bold text-gray-800">Azərbaycan dilində</h2>
+            <h2 className="text-[12px] xl:text-[13px] uppercase tracking-wider font-bold text-gray-800">Azərbaycan dilində</h2>
             <a href="/Kataloq_AZ.pdf" download className="bg-[#f97316] text-white px-4 py-2 rounded text-sm font-semibold hover:bg-orange-600 transition-colors flex items-center gap-2">
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
               Yüklə
@@ -30,7 +30,7 @@ export default function KataloqPage() {
         {/* EN PDF */}
         <div className="flex flex-col h-full bg-white p-4 rounded-xl shadow border border-gray-100">
           <div className="flex justify-between items-center mb-4">
-            <h2 className="text-lg font-bold text-gray-800">English</h2>
+            <h2 className="text-[12px] xl:text-[13px] uppercase tracking-wider font-bold text-gray-800">English</h2>
             <a href="/Kataloq_EN.pdf" download className="bg-[#f97316] text-white px-4 py-2 rounded text-sm font-semibold hover:bg-orange-600 transition-colors flex items-center gap-2">
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
               Download
