@@ -1,4 +1,5 @@
 "use client";
+import PdfUploader from "@/components/PdfUploader";
 
 import React, { useState, useEffect } from "react";
 import Image from "next/image";
@@ -43,7 +44,7 @@ export default function AdminPanel() {
   // Form State
   const [isUploading, setIsUploading] = useState(false);
   const [successMsg, setSuccessMsg] = useState("");
-  const [activeTab, setActiveTab] = useState<"books" | "reviews" | "banners" | "news" | "categories" | "menus" | "pages">("books");
+  const [activeTab, setActiveTab] = useState<"books" | "reviews" | "banners" | "news" | "categories" | "menus" | "pages" | "files">("books");
   
   const [adminBooks, setAdminBooks] = useState<Book[]>([]);
   const [editingId, setEditingId] = useState<number | null>(null);
@@ -883,7 +884,7 @@ info@parafraz.site` }
 
       {/* TABS NAVIGATION */}
       <div className="flex overflow-x-auto gap-2 mb-8 pb-2 border-b border-gray-200" style={{scrollbarWidth: 'none', msOverflowStyle: 'none'}}>
-        {["books", "reviews", "banners", "news", "categories", "menus", "pages"].map(tab => (
+        {["books", "reviews", "banners", "news", "categories", "menus", "pages", "files"].map(tab => (
           <button 
             key={tab}
             onClick={() => setActiveTab(tab as any)}
@@ -896,6 +897,7 @@ info@parafraz.site` }
             {tab === 'categories' && '📑 Kateqoriyalar'}
             {tab === 'menus' && '🔗 Menyular'}
             {tab === 'pages' && '📄 Səhifələr'}
+            {tab === 'files' && '📁 Fayllar (PDF)'}
           </button>
         ))}
       </div>
@@ -1633,6 +1635,7 @@ info@parafraz.site` }
       </div>
       )}
 
+      {activeTab === "files" && (<div className="animate-fade-in"><PdfUploader /></div>)}
 
     </div>
   );

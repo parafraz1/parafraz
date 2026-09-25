@@ -1,0 +1,5 @@
+      {activeTab === "files" && (
+        <div className="animate-fade-in">
+          <PdfUploader />
+        </div>
+      )}
