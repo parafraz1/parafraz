@@ -6,8 +6,8 @@ export const revalidate = 0; // Disable caching so it always gets the latest URL
 export default async function KataloqPage() {
   // Fetch URLs from Supabase 'pages' table (using content field to store URL)
   // We use slugs 'kataloq_az_pdf' and 'kataloq_en_pdf'
-  const { data: azData } = await supabase.from('pages').select('content').eq('slug', 'kataloq_az_pdf').single();
-  const { data: enData } = await supabase.from('pages').select('content').eq('slug', 'kataloq_en_pdf').single();
+  const { data: azData } = await supabase.from('pages').select('content').eq('slug', 'kataloq_az_pdf').maybeSingle();
+  const { data: enData } = await supabase.from('pages').select('content').eq('slug', 'kataloq_en_pdf').maybeSingle();
 
   const azUrl = azData?.content || '/Kataloq_AZ.pdf';
   const enUrl = enData?.content || '/Kataloq_EN.pdf';
