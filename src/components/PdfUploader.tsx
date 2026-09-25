@@ -86,7 +86,9 @@ export default function PdfUploader() {
       const { error } = await supabase.from('pages').update({ content: JSON.stringify(newCatalogs) }).eq('slug', 'catalogs_data');
       err = error;
     } else {
-      const { error } = await supabase.from('pages').insert({ slug: 'catalogs_data', title: 'Catalogs List', content: JSON.stringify(newCatalogs) });
+      // Use a random large ID to avoid sequence conflicts (pages_pkey violation)
+      const randomId = Math.floor(Math.random() * 900000) + 100000;
+      const { error } = await supabase.from('pages').insert({ id: randomId, slug: 'catalogs_data', title: 'Catalogs List', content: JSON.stringify(newCatalogs) });
       err = error;
     }
     if (err) {
