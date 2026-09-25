@@ -76,3 +76,4 @@ body {
 
 .ql-editor { text-align: justify; }
 .prose p { text-align: justify; }
+.ql-editor p { text-align: justify !important; }

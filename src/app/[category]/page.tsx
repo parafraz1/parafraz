@@ -36,7 +36,10 @@ export default async function CategoryPage({ params }: { params: Promise<{ categ
   if (!categoryData) {
     notFound();
   }
-  const categoryBooks = allBooks.filter(b => b.categorySlugs.includes(resolvedParams.category));
+  let categoryBooks = allBooks.filter(b => b.categorySlugs.includes(resolvedParams.category));
+  if (resolvedParams.category === "butun-kitablar") {
+    categoryBooks = categoryBooks.filter(b => !b.categorySlugs.includes("gelecek-neshrler"));
+  }
 
   return (
     <div className="py-8 px-4 md:px-8 animate-fade-in w-full max-w-[1250px] mx-auto overflow-hidden">

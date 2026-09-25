@@ -47,7 +47,7 @@ export default async function Home() {
               <svg className="transform group-open:rotate-180 transition-transform duration-200" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><polyline points="6 9 12 15 18 9"></polyline></svg>
             </summary>
             <ul className="flex flex-col border-t border-orange-200">
-              {categories.filter(c => !["butun-kitablar", "naringi-neshrleri", "xeberler", "muellifler", "tarixi-romanlar", "gelecek-neshrler", "detektiv"].includes(c.slug)).map((cat, idx) => (
+              {categories.map((cat, idx) => (
                 <li key={idx} className="border-b border-gray-100 last:border-0">
                   <Link href={`/${cat.slug}`} className="block py-3 px-5 text-gray-700 text-[13px] hover:text-[#f97316] hover:bg-orange-50 transition-colors uppercase">
                     {cat.name}
@@ -63,7 +63,7 @@ export default async function Home() {
               KATEQORİYALAR
             </h2>
             <ul className="flex flex-col">
-              {categories.filter(c => !["butun-kitablar", "naringi-neshrleri", "xeberler", "muellifler", "tarixi-romanlar", "gelecek-neshrler", "detektiv"].includes(c.slug)).map((cat, idx) => (
+              {categories.map((cat, idx) => (
                 <li key={idx} className="border-b border-gray-100 last:border-0 group-hover:block">
                   <Link href={`/${cat.slug}`} className="block py-3 px-5 text-gray-700 text-[13px] hover:text-[#f97316] hover:bg-orange-50 hover:pl-6 transition-all duration-300 uppercase">
                     {cat.name}

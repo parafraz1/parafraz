@@ -22,7 +22,7 @@ export const fetchCategories = async (includeInactive = false): Promise<Category
       { id: 10, name: "Gələcək nəşrlər", slug: "gelecek-neshrler" },
     ];
   }
-  let cats = data.map(c => ({ id: c.id, name: c.name, slug: c.slug, type: c.type, active: c.active !== false }));
+  let cats = data.map(c => ({ id: c.id, name: c.slug === "gelecek-neshrler" ? "Gələcək nəşrlər" : c.name, slug: c.slug, type: c.type, active: c.active !== false }));
   if (!cats.find(c => c.slug === 'gelecek-neshrler')) {
     cats.push({ id: 9999, name: "Gələcək nəşrlər", slug: "gelecek-neshrler", type: "kitab", active: true });
   }
