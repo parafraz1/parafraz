@@ -5,35 +5,42 @@ import Image from 'next/image';
 
 const IMGBB_API_KEY = "47aba2afb9a71d5c948bbd0af36a55f6";
 
+interface CatalogBook {
+  id: string;
+  title: string;
+  image: string;
+  description: string;
+  pdfAz: string;
+  pdfEn: string;
+}
+
 export default function PdfUploader() {
   const [file, setFile] = useState<File | null>(null);
   const [isUploading, setIsUploading] = useState(false);
   const [resultLink, setResultLink] = useState('');
   const [errorMsg, setErrorMsg] = useState('');
 
-  const [azData, setAzData] = useState({ url: '', image: '', description: '' });
-  const [enData, setEnData] = useState({ url: '', image: '', description: '' });
-  
+  const [catalogs, setCatalogs] = useState<CatalogBook[]>([]);
   const [isSaving, setIsSaving] = useState(false);
-  const [saveSuccess, setSaveSuccess] = useState(false);
+  const [editingCatId, setEditingCatId] = useState<string | null>(null);
+
+  // Form states
+  const [title, setTitle] = useState('');
+  const [image, setImage] = useState('');
+  const [description, setDescription] = useState('');
+  const [pdfAz, setPdfAz] = useState('');
+  const [pdfEn, setPdfEn] = useState('');
 
   useEffect(() => {
-    const fetchLinks = async () => {
-      const { data: azRes } = await supabase.from('pages').select('content').eq('slug', 'kataloq_az_pdf').maybeSingle();
-      const { data: enRes } = await supabase.from('pages').select('content').eq('slug', 'kataloq_en_pdf').maybeSingle();
-      
-      try {
-        if (azRes?.content) {
-          if (azRes.content.startsWith('{')) setAzData(JSON.parse(azRes.content));
-          else setAzData({ url: azRes.content, image: '', description: '' });
-        }
-        if (enRes?.content) {
-          if (enRes.content.startsWith('{')) setEnData(JSON.parse(enRes.content));
-          else setEnData({ url: enRes.content, image: '', description: '' });
-        }
-      } catch (e) {}
+    const fetchCatalogs = async () => {
+      const { data } = await supabase.from('pages').select('content').eq('slug', 'catalogs_data').maybeSingle();
+      if (data?.content) {
+        try {
+          setCatalogs(JSON.parse(data.content));
+        } catch (e) {}
+      }
     };
-    fetchLinks();
+    fetchCatalogs();
   }, []);
 
   const handleUpload = async (e: React.FormEvent) => {
@@ -47,11 +54,7 @@ export default function PdfUploader() {
     formData.append('file', file);
 
     try {
-      const res = await fetch('/api/upload-pdf', {
-        method: 'POST',
-        body: formData,
-      });
-
+      const res = await fetch('/api/upload-pdf', { method: 'POST', body: formData });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || 'Xəta baş verdi');
       setResultLink(data.url || data.downloadUrl);
@@ -62,55 +65,76 @@ export default function PdfUploader() {
     }
   };
 
-  const handleImageUpload = async (file: File, lang: 'az' | 'en') => {
+  const handleImageUpload = async (file: File) => {
     const formData = new FormData();
     formData.append("image", file);
     try {
       const res = await fetch(`https://api.imgbb.com/1/upload?key=${IMGBB_API_KEY}`, { method: "POST", body: formData });
       const data = await res.json();
       if (data.success) {
-        if (lang === 'az') setAzData(p => ({ ...p, image: data.data.url }));
-        else setEnData(p => ({ ...p, image: data.data.url }));
+        setImage(data.data.url);
       }
     } catch (error) {
       alert("Şəkil yüklənərkən xəta baş verdi.");
     }
   };
 
-  const saveCatalogLinks = async () => {
-    setIsSaving(true);
-    setSaveSuccess(false);
-    try {
-      // Upsert AZ
-      const { data: azExist } = await supabase.from('pages').select('id').eq('slug', 'kataloq_az_pdf').maybeSingle();
-      if (azExist) {
-        await supabase.from('pages').update({ content: JSON.stringify(azData) }).eq('slug', 'kataloq_az_pdf');
-      } else {
-        await supabase.from('pages').insert({ slug: 'kataloq_az_pdf', title: 'Kataloq AZ', content: JSON.stringify(azData) });
-      }
-
-      // Upsert EN
-      const { data: enExist } = await supabase.from('pages').select('id').eq('slug', 'kataloq_en_pdf').maybeSingle();
-      if (enExist) {
-        await supabase.from('pages').update({ content: JSON.stringify(enData) }).eq('slug', 'kataloq_en_pdf');
-      } else {
-        await supabase.from('pages').insert({ slug: 'kataloq_en_pdf', title: 'Kataloq EN', content: JSON.stringify(enData) });
-      }
-
-      setSaveSuccess(true);
-      setTimeout(() => setSaveSuccess(false), 3000);
-    } catch (err) {
-      alert("Xəta baş verdi!");
-    } finally {
-      setIsSaving(false);
+  const saveToDb = async (newCatalogs: CatalogBook[]) => {
+    const { data: exist } = await supabase.from('pages').select('id').eq('slug', 'catalogs_data').maybeSingle();
+    if (exist) {
+      await supabase.from('pages').update({ content: JSON.stringify(newCatalogs) }).eq('slug', 'catalogs_data');
+    } else {
+      await supabase.from('pages').insert({ slug: 'catalogs_data', title: 'Catalogs List', content: JSON.stringify(newCatalogs) });
     }
+  };
+
+  const handleAddOrUpdate = async () => {
+    if (!title || !image) {
+      alert("Kataloqun adı və şəkli mütləqdir!");
+      return;
+    }
+    
+    setIsSaving(true);
+    let newCatalogs = [...catalogs];
+
+    if (editingCatId) {
+      newCatalogs = newCatalogs.map(c => c.id === editingCatId ? { id: c.id, title, image, description, pdfAz, pdfEn } : c);
+    } else {
+      const newCat: CatalogBook = {
+        id: Date.now().toString(),
+        title, image, description, pdfAz, pdfEn
+      };
+      newCatalogs.push(newCat);
+    }
+
+    await saveToDb(newCatalogs);
+    setCatalogs(newCatalogs);
+    setEditingCatId(null);
+    setTitle(''); setImage(''); setDescription(''); setPdfAz(''); setPdfEn('');
+    setIsSaving(false);
+  };
+
+  const handleEdit = (cat: CatalogBook) => {
+    setEditingCatId(cat.id);
+    setTitle(cat.title);
+    setImage(cat.image);
+    setDescription(cat.description);
+    setPdfAz(cat.pdfAz);
+    setPdfEn(cat.pdfEn);
+  };
+
+  const handleDelete = async (id: string) => {
+    if (!confirm("Silmək istədiyinizə əminsiniz?")) return;
+    const newCatalogs = catalogs.filter(c => c.id !== id);
+    await saveToDb(newCatalogs);
+    setCatalogs(newCatalogs);
   };
 
   return (
     <div className="flex flex-col gap-8">
-      {/* Upload Section */}
+      {/* Utility: Upload PDF to get link */}
       <div className="bg-white p-6 rounded shadow border border-gray-100">
-        <h3 className="font-bold text-gray-800 text-lg mb-4 border-b pb-2">Google Drive-a PDF Yüklə</h3>
+        <h3 className="font-bold text-gray-800 text-lg mb-4 border-b pb-2">1. Google Drive-a PDF Yüklə (Link almaq üçün)</h3>
         <form onSubmit={handleUpload} className="flex flex-col gap-4">
           <div>
             <label className="block text-sm font-semibold text-gray-700 mb-2">Fayl seçin (PDF)</label>
@@ -121,14 +145,13 @@ export default function PdfUploader() {
             />
           </div>
           <button type="submit" disabled={!file || isUploading} className="w-max px-6 py-2 bg-[#f97316] hover:bg-orange-600 text-white font-bold rounded disabled:opacity-50 transition-colors">
-            {isUploading ? 'Yüklənir...' : 'Yüklə'}
+            {isUploading ? 'Yüklənir...' : 'Yüklə & Link Al'}
           </button>
         </form>
         {errorMsg && <div className="mt-4 p-3 bg-red-50 text-red-600 text-sm rounded border border-red-200">{errorMsg}</div>}
         {resultLink && (
           <div className="mt-6 p-4 bg-green-50 rounded border border-green-200">
             <p className="text-green-800 font-bold mb-2">✅ Uğurla yükləndi!</p>
-            <p className="text-sm text-gray-700 mb-1">Aşağıdakı linki kopyalayıb istədiyiniz yerdə istifadə edə bilərsiniz:</p>
             <div className="flex items-center gap-2 mt-2">
               <input type="text" readOnly value={resultLink} className="flex-1 p-2 text-sm border border-green-300 rounded bg-white outline-none" />
               <button onClick={() => { navigator.clipboard.writeText(resultLink); alert("Link kopyalandı!"); }} className="px-3 py-2 bg-green-600 text-white text-sm font-bold rounded hover:bg-green-700 transition-colors">Kopyala</button>
@@ -137,64 +160,73 @@ export default function PdfUploader() {
         )}
       </div>
 
-      {/* Catalog Info Section */}
+      {/* Catalog Manager */}
       <div className="bg-white p-6 rounded shadow border border-gray-100 mb-10">
-        <h3 className="font-bold text-gray-800 text-lg mb-4 border-b pb-2">Kataloq Səhifəsini Yenilə</h3>
-        <p className="text-sm text-gray-500 mb-6">Hər kataloq üçün şəkil, qısa məzmun və PDF linkini təyin edin. Bu məlumatlar saytda kitab kartı kimi görünəcək.</p>
-
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-          {/* AZ */}
-          <div className="flex flex-col gap-4 border border-gray-200 p-4 rounded bg-gray-50">
-            <h4 className="font-bold text-[#f97316]">Azərbaycan dilində Kataloq</h4>
-            
-            <div>
-              <label className="block text-sm font-semibold text-gray-700 mb-1">Kataloq Üz Qabığı (Şəkil)</label>
-              <div className="flex items-center gap-4">
-                {azData.image && <div className="relative w-16 h-24 border bg-white"><Image src={azData.image} alt="AZ Cover" fill className="object-cover" /></div>}
-                <input type="file" accept="image/*" onChange={e => e.target.files?.[0] && handleImageUpload(e.target.files[0], 'az')} className="text-sm" />
-              </div>
-            </div>
-
-            <div>
-              <label className="block text-sm font-semibold text-gray-700 mb-1">Qısa məlumat</label>
-              <textarea value={azData.description} onChange={e => setAzData(p => ({...p, description: e.target.value}))} className="w-full p-2 border border-gray-300 rounded focus:outline-none focus:border-[#f97316] text-sm h-20" placeholder="Kataloq haqqında qısa məlumat..." />
-            </div>
-
-            <div>
-              <label className="block text-sm font-semibold text-gray-700 mb-1">PDF Linki (Drive)</label>
-              <input type="text" value={azData.url} onChange={e => setAzData(p => ({...p, url: e.target.value}))} className="w-full p-2 border border-gray-300 rounded focus:outline-none focus:border-[#f97316] text-sm" placeholder="https://drive.google.com/..." />
+        <h3 className="font-bold text-gray-800 text-lg mb-4 border-b pb-2">2. Kataloq Kitablarını İdarə Et</h3>
+        
+        {/* Form */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 bg-gray-50 p-4 border border-gray-200 rounded mb-6">
+          <div className="md:col-span-2">
+            <label className="block text-sm font-semibold text-gray-700 mb-1">Kitabın Adı</label>
+            <input type="text" value={title} onChange={e => setTitle(e.target.value)} className="w-full p-2 border border-gray-300 rounded text-sm" placeholder="Məs: Xüsusi Nəşrlər Kataloqu 2024" />
+          </div>
+          
+          <div className="md:col-span-2">
+            <label className="block text-sm font-semibold text-gray-700 mb-1">Şəkil (Üz qabığı)</label>
+            <div className="flex items-center gap-4">
+              {image && <div className="relative w-12 h-16 border bg-white"><Image src={image} alt="Cover" fill className="object-cover" /></div>}
+              <input type="file" accept="image/*" onChange={e => e.target.files?.[0] && handleImageUpload(e.target.files[0])} className="text-sm" />
             </div>
           </div>
 
-          {/* EN */}
-          <div className="flex flex-col gap-4 border border-gray-200 p-4 rounded bg-gray-50">
-            <h4 className="font-bold text-[#f97316]">İngilis dilində Kataloq</h4>
-            
-            <div>
-              <label className="block text-sm font-semibold text-gray-700 mb-1">Kataloq Üz Qabığı (Şəkil)</label>
-              <div className="flex items-center gap-4">
-                {enData.image && <div className="relative w-16 h-24 border bg-white"><Image src={enData.image} alt="EN Cover" fill className="object-cover" /></div>}
-                <input type="file" accept="image/*" onChange={e => e.target.files?.[0] && handleImageUpload(e.target.files[0], 'en')} className="text-sm" />
-              </div>
-            </div>
+          <div className="md:col-span-2">
+            <label className="block text-sm font-semibold text-gray-700 mb-1">Haqqında Məlumat</label>
+            <textarea value={description} onChange={e => setDescription(e.target.value)} className="w-full p-2 border border-gray-300 rounded text-sm h-20" placeholder="Qısa məlumat..." />
+          </div>
 
-            <div>
-              <label className="block text-sm font-semibold text-gray-700 mb-1">Qısa məlumat</label>
-              <textarea value={enData.description} onChange={e => setEnData(p => ({...p, description: e.target.value}))} className="w-full p-2 border border-gray-300 rounded focus:outline-none focus:border-[#f97316] text-sm h-20" placeholder="Kataloq haqqında qısa məlumat..." />
-            </div>
+          <div>
+            <label className="block text-sm font-semibold text-gray-700 mb-1">AZ PDF Linki</label>
+            <input type="text" value={pdfAz} onChange={e => setPdfAz(e.target.value)} className="w-full p-2 border border-gray-300 rounded text-sm" placeholder="Drive linki (AZ)..." />
+          </div>
 
-            <div>
-              <label className="block text-sm font-semibold text-gray-700 mb-1">PDF Linki (Drive)</label>
-              <input type="text" value={enData.url} onChange={e => setEnData(p => ({...p, url: e.target.value}))} className="w-full p-2 border border-gray-300 rounded focus:outline-none focus:border-[#f97316] text-sm" placeholder="https://drive.google.com/..." />
-            </div>
+          <div>
+            <label className="block text-sm font-semibold text-gray-700 mb-1">EN PDF Linki</label>
+            <input type="text" value={pdfEn} onChange={e => setPdfEn(e.target.value)} className="w-full p-2 border border-gray-300 rounded text-sm" placeholder="Drive linki (EN)..." />
+          </div>
+
+          <div className="md:col-span-2 flex gap-3 mt-2">
+            <button onClick={handleAddOrUpdate} disabled={isSaving} className="px-6 py-2 bg-gray-800 hover:bg-black text-white font-bold rounded text-sm disabled:opacity-50 transition-colors">
+              {isSaving ? 'Gözləyin...' : (editingCatId ? 'Yenilə' : 'Kataloqa Əlavə Et')}
+            </button>
+            {editingCatId && (
+              <button onClick={() => { setEditingCatId(null); setTitle(''); setImage(''); setDescription(''); setPdfAz(''); setPdfEn(''); }} className="px-6 py-2 bg-gray-200 hover:bg-gray-300 text-gray-800 font-bold rounded text-sm transition-colors">
+                Ləğv Et
+              </button>
+            )}
           </div>
         </div>
 
-        <div className="mt-6 flex items-center gap-4">
-          <button onClick={saveCatalogLinks} disabled={isSaving} className="px-6 py-2 bg-gray-800 hover:bg-black text-white font-bold rounded disabled:opacity-50 transition-colors">
-            {isSaving ? 'Yadda saxlanılır...' : 'Yadda Saxla'}
-          </button>
-          {saveSuccess && <p className="text-green-600 font-bold text-sm">✅ Uğurla yadda saxlanıldı!</p>}
+        {/* List */}
+        <div>
+          <h4 className="font-bold text-gray-700 mb-3">Mövcud Kataloqlar ({catalogs.length})</h4>
+          <div className="flex flex-col gap-3">
+            {catalogs.length === 0 && <p className="text-sm text-gray-500">Heç bir kataloq əlavə edilməyib.</p>}
+            {catalogs.map(cat => (
+              <div key={cat.id} className="flex gap-4 items-center p-3 border border-gray-100 rounded bg-white shadow-sm">
+                <div className="relative w-12 h-16 flex-shrink-0 bg-gray-100 border border-gray-200">
+                  <Image src={cat.image} alt={cat.title} fill className="object-cover" />
+                </div>
+                <div className="flex-1 min-w-0">
+                  <h5 className="font-bold text-gray-800 truncate">{cat.title}</h5>
+                  <p className="text-xs text-gray-500 truncate">{cat.description}</p>
+                </div>
+                <div className="flex gap-2 flex-shrink-0">
+                  <button onClick={() => handleEdit(cat)} className="px-3 py-1.5 bg-blue-50 text-blue-600 rounded font-bold text-xs hover:bg-blue-100">Düzənlə</button>
+                  <button onClick={() => handleDelete(cat.id)} className="px-3 py-1.5 bg-red-50 text-red-600 rounded font-bold text-xs hover:bg-red-100">Sil</button>
+                </div>
+              </div>
+            ))}
+          </div>
         </div>
       </div>
     </div>
