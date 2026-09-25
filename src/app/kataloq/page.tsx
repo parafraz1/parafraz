@@ -36,7 +36,7 @@ export default async function KataloqListPage() {
   return (
     <div className="py-12 px-4 md:px-8 animate-fade-in w-full max-w-[1250px] mx-auto">
       <div className="border-b-2 border-[#f97316] mb-8 pb-3 flex justify-between items-end">
-        <h1 className="text-[12px] xl:text-[13px] font-bold text-gray-800 uppercase tracking-wider">Kataloqlarımız</h1>
+        <h1 className="text-[12px] xl:text-[13px] font-bold text-gray-800 uppercase tracking-wider">Kataloq</h1>
         <p className="text-gray-500 text-sm">Ümumi: <span className="font-bold text-[#f97316]">{catalogs.length}</span></p>
       </div>
 
@@ -45,7 +45,7 @@ export default async function KataloqListPage() {
           <Link href={`/kataloq/${cat.id}`} key={cat.id} className="group flex flex-col">
             <div className="relative w-full pt-[140%] bg-gray-100 rounded-md overflow-hidden mb-3 border border-gray-200">
               {cat.image ? (
-                <Image src={cat.image} alt={cat.title} fill className="object-cover group-hover:scale-105 transition-transform duration-500" />
+                <Image src={cat.image} alt={cat.title} fill priority sizes="(max-width: 768px) 50vw, (max-width: 1200px) 25vw, 20vw" className="object-cover group-hover:scale-105 transition-transform duration-500" />
               ) : (
                 <div className="absolute inset-0 flex items-center justify-center text-gray-400">Şəkil yoxdur</div>
               )}

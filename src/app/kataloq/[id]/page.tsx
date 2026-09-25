@@ -49,7 +49,7 @@ export default async function KataloqDetailPage({ params }: { params: Promise<{ 
         <div className="w-full md:w-[300px] lg:w-[400px] flex-shrink-0">
           <div className="relative w-full pt-[140%] bg-gray-100 rounded-md overflow-hidden border border-gray-200 shadow-md">
             {catalog.image ? (
-              <Image src={catalog.image} alt={catalog.title} fill className="object-cover" priority />
+              <Image src={catalog.image} alt={catalog.title} fill priority sizes="(max-width: 768px) 100vw, 400px" className="object-cover" />
             ) : (
               <div className="absolute inset-0 flex items-center justify-center text-gray-400">Şəkil yoxdur</div>
             )}
